@@ -22,7 +22,7 @@ class VerifyCsrfToken extends Middleware
         'api/product/registerProduct',
         'api/product/updateProduct/*',
         'api/order/registerOrder',
-        'api/order/updateOrder/*',
+        'api/order/updateOrder',
         'api/order/asignProducts',
         'api/order/asignarProductos',
         

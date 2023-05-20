@@ -61,6 +61,12 @@ class OrderController extends Controller
         ->where('o.order_id', $id)
         ->get();
 
+        $detailProducts = DB::table('order_detail as o')
+        ->select('o.product_id','p.product_id','p.product_description','p.product_amount','p.product_value','p.product_status')
+        ->leftjoin('products AS p', 'p.product_id','=','o.product_id')
+        ->where('o.order_id', $id)
+        ->get();
+
  
      if (is_object($orders)) {
  
@@ -68,7 +74,7 @@ class OrderController extends Controller
                          'code' => 200,
                          'orders' => $orders,
                          'cantidad' => $cantidad,
-                         'orden_id' => $id
+                         'detailProducts' => $detailProducts
                      
                      );
      
@@ -101,14 +107,20 @@ class OrderController extends Controller
                  $orders->order_satus = $params_array['order_satus'];
                  $orders->save();
 
-                 /*
-                 $id_insertado = Order::latest('order_id')->first();
+
+                 $id_recien_guardado=Order::select('order_id')->orderby('created_at','DESC')->first();
+
+
+
+                 $id_insertado = $id_recien_guardado->order_id;
+
 
                  $producto_insertado = new OrderDetail();
                  $producto_insertado->order_id = $id_insertado;
-                 $producto_insertado->product_id = $params_array['product_id'];
                  $producto_insertado->save();
-                 */
+
+                 
+                 
                     
                  $data = array('status' => 'success',
                              'code' => 200,
@@ -120,28 +132,40 @@ class OrderController extends Controller
  
     }
 
-    public function updateOrder($id, Request $request)
+    public function updateOrder(Request $request)
     {
              // recoger los datos
 
              $json = $request->input('json', null);
- 
              $params_array = json_decode($json, true); // obtengo un array 
- 
-             if (!empty($params_array)) {
-               
-                 $validate = \Validator::make($params_array, [
 
-                    'order_date' => 'required',
-                    'order_total' => 'required',
-                    'order_date_delivery' => 'required',
-                    'order_satus' => 'required'
+             // product_id
+
+             $id = $params_array['order_id'];
+
+             $ordenes = DB::table('order_detail')
+             ->select('detail_id')
+             ->where('order_id', $id)
+             ->orderby('created_at','DESC')->first();
+
+             
+             $id_detalle = $ordenes->detail_id;
+                        
+                $orders = OrderDetail::find($id_detalle);
+                $orders->product_id=$params_array['product_id'];
+                $orders->save();
+
+      
+                 var_dump($orders);
+                 die;
                  
-                 ]);
-     
-                     $orders = Order::where('order_id', $id)->update(
-                       $params_array
-                     );
+                    //  $id_recien_guardado=Order::select('order_id')->orderby('created_at','DESC')->first();
+                   //  $orders=IPEVRprocesos::find($id_proceso);
+
+                //     $orders->product_id=$params_array['product_id'];
+                  //   $orders->tipo=$tipo;
+
+                    
  
                      $data = array('status' => 'success',
                      'code' => 200,
@@ -149,13 +173,8 @@ class OrderController extends Controller
                      'orders' => $params_array
                  );
  
-             }else {
-                 $data = array('status' => 'error',
-                 'code' => 400,
-                 'message' => 'No se ha enviado ninguna Orden',
-             );
-             }
- 
+           
+
              return response()->json($data, $data['code']);
  
     }
@@ -180,26 +199,6 @@ class OrderController extends Controller
                  // devolver resultado
                  return response()->json($data, $data['code']);
      
-        
-
-        /*
-             // recoger los datos
-             $json = $request->input('json', null);
-             $params_array = json_decode($json, true);
-
-                $orders  = new OrderDetail();
-                $orders->order_id = $params_array['order_id'];
-                $orders->product_id = $params_array['product_id'];
-                $orders->save();
-                
-            
-                $data = array('status' => 'success',
-                            'code' => 200,
-                            'orders' => $orders
-                        );
- 
-             return response()->json($data, $data['code']);
-             */
  
     }
 
@@ -245,7 +244,7 @@ class OrderController extends Controller
  
     }
 
-    public function asignarProductos(Request $request)
+    public function asignarProduct(Request $request)
     {
 
              // recoger datos por post
@@ -265,11 +264,7 @@ class OrderController extends Controller
       
              // devolver resultado
              return response()->json($data, $data['code']);
- 
 
-        
-
- 
  
     }
 

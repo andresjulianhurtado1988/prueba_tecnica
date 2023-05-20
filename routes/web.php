@@ -45,9 +45,9 @@ Route::get('api/order/getProductsAsign/{id}', [OrderController::class, 'getProdu
 Route::get('api/order/showAll', [OrderController::class, 'showAll'])->name('showAll');
 Route::post('api/order/registerOrder', [OrderController::class, 'registerOrder'])->name('registerOrder');
 Route::get('api/order/showOrder/{id}', [OrderController::class, 'showOrder'])->name('showOrder');
-Route::put('api/order/updateOrder/{id}', [OrderController::class, 'updateOrder'])->name('updateOrder');
+
 Route::post('api/order/asignProducts', [OrderController::class, 'asignProducts'])->name('asignProducts');
 Route::get('api/order/deleteProductsAsign/{id}', [OrderController::class, 'deleteProductsAsign'])->name('deleteProductsAsign');
 
-Route::post('api/order/asignarProductos', [OrderController::class, 'asignarProductos'])->name('asignarProductos');
-
+Route::post('api/order/asignarProduct', [OrderController::class, 'asignarProduct'])->name('asignarProduct');
+Route::put('api/order/updateOrder', [OrderController::class, 'updateOrder'])->name('updateOrder');
